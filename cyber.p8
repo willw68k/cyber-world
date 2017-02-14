@@ -11,19 +11,18 @@ actor.tmr = 1
 actor.flp = false
 
 apartm = {}
-apartm.x0 = 10
+apartm.x0 = 0
 apartm.y0 = 10
-apartm.x1 = 100
+apartm.x1 = 90
 apartm.y1 = 40
 
 current_lvl = {}
 current_lvl.number = 0
 
-function sprite_animator(x)
-	local y = 0 
-	y += x
-	return y
-end	
+function _init() 
+	cls()
+	lvl_change(1)
+end
 	
 -- character move function
 function move_actor(bl, br)
@@ -64,6 +63,94 @@ function move_actor(bl, br)
 	end
 end
 
+function sprite_animator(x)
+	local y = 0 
+	y += x
+	return y
+end	
+
+----------------------------------------------
+ 	
+cl01 = {
+	current = 0,
+	top_offset = -3,
+	top_width = 5,
+	middle_width = 9,
+	middle_offset = -5,
+	bottom_width = 4,
+	bottom_offset = -2,
+	max_size = false,
+	delay_start = 0,
+	delay_end = 0
+}
+cl02 = {
+	current = 0,
+	top_offset = -4,
+	top_width = 5,
+	middle_width = 9,
+	middle_offset = -3,
+	bottom_width = 4,
+	bottom_offset = -6,
+	max_size = false,
+	delay_start = 0,
+	delay_end = 200
+}
+
+function cloud_draw(cl_next, top)
+	if cl_next.delay_start < cl_next.delay_end then
+		cl_next.delay_start += 1
+		
+	else 
+		if cl_next.current < 20  then
+			cl_next.current += 2
+			
+		else 
+			cl_next.current = 0 
+			cl_next.top_offset += 1
+			cl_next.middle_offset += 1
+			cl_next.bottom_offset += 1
+			if cl_next.bottom_width > 3 and cl_next.bottom_width <= 11 and cl_next.max_size == false then
+				cl_next.bottom_width +=1
+		
+			elseif cl_next.bottom_width >= 8 then
+				cl_next.bottom_width -= 1
+				cl_next.max_size = true
+			
+			elseif cl_next.bottom_width < 9 and cl_next.max_size == true then
+				cl_next.bottom_width += 1
+				cl_next.max_size = false
+			end
+		end
+		
+		--line1
+		for i=0,cl_next.top_width do
+			if cl_next.top_offset > 56 then
+				cl_next.top_offset = 0
+			else
+				pset(cl_next.top_offset+i, top, 7)
+			end
+		end
+		
+		--line2
+		for i=0,cl_next.middle_width do
+			if cl_next.middle_offset > 56 then
+				cl_next.middle_offset = 0
+			else
+				pset(cl_next.middle_offset+i, top+1, 7)
+			end
+		end
+		
+		--line3
+		for i=0,cl_next.bottom_width do
+			if cl_next.bottom_offset > 56 then
+				cl_next.bottom_offset = 0
+			else
+				pset(cl_next.bottom_offset+i, top+2, 7)
+			end
+		end
+	end
+end
+
 function lvl_change(ln)
 	current_lvl.number = ln
 	if current_lvl.number==1 then 
@@ -74,56 +161,62 @@ end
 
 function draw_lvl()
 	if current_lvl.number==1 then 
-		rectfill(apartm.x0,apartm.y0,apartm.x1,apartm.y1, 6)
-		rectfill(apartm.x0,apartm.y0+15,apartm.x1,apartm.y1-37, 6)
-
-		rectfill(15, 31, 55, 8, 8)
-		rect(14, 31, 56, 8, 13)
-
+		--window
+		rectfill(5, 31, 45, 8, 8)
 		d = 1.5
 		for c=0,5 do
 			rectfill(apartm.x0+5, (apartm.y0+20)-d, apartm.x1-45, (apartm.y1-10)-d, 9)
 			d = c *3.5
 		end
+		cloud01 = cloud_draw(cl01, 15)
+		cloud02 = cloud_draw(cl02, 19)
+		
+		-- walls
+		rectfill(0,5,90,8, 6)
+		rectfill(0,5,4,40, 6)
+		rectfill(0,31,90,40, 6)
+		rectfill(46,5,90,40, 6)
+		
+		rect(4, 31, 46, 8, 13)
+		
+		-- Buildings
 		spr(15,apartm.x0+39,apartm.y0+6,1,2,false)
 		spr(13,apartm.x0+23,apartm.y0+6,2,2,false)
 		spr(29,apartm.x0+5,apartm.y0+13,2,1,true)
-		
+
 		-- footer
 		for i=0, 87,8 do
-			spr(47,10+i,33,1,1,false)
+			spr(47,0+i,33,1,1,false)
 		end
 		--hole
-		spr(11,75,24,1,1,false)
+		spr(11,65,24,1,1,false)
 		--table
-		spr(12,59,33,1,1,false)
-		line(67, 33, 70, 33, 4)
-		line(67, 34, 70, 34, 4)
-		spr(12,71,33,1,1,true)
+		spr(12,49,33,1,1,false)
+		line(57, 33, 60, 33, 4)
+		line(57, 34, 60, 34, 4)
+		spr(12,61,33,1,1,true)
 
 		--door
-		rectfill(86, 40, 99, 18, 4)
-		line(86, 18, 99, 18, 5)
-		line(86, 18, 86, 40, 5)
-		line(99, 19, 99, 40, 9)
+		rectfill(76, 40, 89, 18, 4)
+		line(76, 18, 89, 18, 5)
+		line(76, 18, 76, 40, 5)
+		line(89, 19, 89, 40, 9)
 		
+		--door knob
 		dn = 1
 		for dn1=0, 1 do
 			for iw=0, 2 do
-				pset(87+dn, 31, 9)
+				pset(77+dn, 31, 9)
 			end
 			for iw=0, 2 do
-				pset(87+dn, 32, 5)
+				pset(77+dn, 32, 5)
 			end
 			dn=dn+1
 		end
+		
 	end
 end
 
-function _init() 
-	cls()
-	lvl_change(1)
-end
 
 function _update()
 	if current_lvl.number==1 then
@@ -136,9 +229,10 @@ end
 
 function _draw()
 	cls()
-	sprite_animator(0.2)
 	draw_lvl()
-	spr(actor.sprt,actor.x,actor.y,2,2,actor.flp)
+
+	spr(actor.sprt,actor.x,actor.y,2,2,actor.flp)	
+	
 end
 __gfx__
 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000444444440000000000000000000d0000
