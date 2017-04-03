@@ -37,6 +37,26 @@ function glitch()
 	glit.t+=1
 end
 
+d = 0
+function stringlength(l)
+	d = #l
+	return d
+end
+
+i = 128
+
+function printMessage(s)
+	local str=s
+	local dist=stringlength(s)
+
+	
+	if i < (-256 - dist) then
+		i = 128
+	end
+	print(str, i, 118, 7)
+	i = i-1
+end
+
 function _update()
 
 end
@@ -64,6 +84,8 @@ function _draw()
 	spr(36,94,35,2,2)
 	spr(38,105,35,2,2)
 	spr(38,116,35,2,2)
+	
+	printMessage("A SMALL DEMO ILLUSTRATING RANDOM SCREEN STATIC - www.whiteoutlabs.com");
 	
 	glitch() -- Start the static/glitch overlay
 end
